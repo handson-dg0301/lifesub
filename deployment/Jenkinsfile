@@ -12,7 +12,7 @@ podTemplate(
     containers: [
         containerTemplate(name: 'podman', image: "mgoltzsche/podman", ttyEnabled: true, command: 'cat', privileged: true),
         containerTemplate(name: 'gradle',
-                        image: 'gradle:jdk17',
+                        image: 'gradle:jdk21',
                         ttyEnabled: true,
                         command: 'cat',
                         envVars: [
@@ -181,7 +181,7 @@ testcontainers.reuse.enable=true'''
                     echo "Waiting for deployments to be ready..."
                     kubectl -n ${namespace} wait --for=condition=available deployment/member --timeout=300s
                     kubectl -n ${namespace} wait --for=condition=available deployment/mysub --timeout=300s
-                    kubectl -n ${namespace} wait --for=condition=available deployment/recommend --timeout=300s
+                    kube`ctl -n ${namespace} wait --for=condition=available deployment/recommend --timeout=300s
                 """
             }
         }
