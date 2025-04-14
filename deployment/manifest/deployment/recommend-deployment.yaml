@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommend
+  labels:
+    app: recommend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommend
+  template:
+    metadata:
+      labels:
+        app: recommend
+    spec:
+      containers:
+      - name: recommend
+        image: acrdigitalgarage01.azurecr.io/dg0301/recommend:1.0.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8083
+        envFrom:
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: recommend-config
+        - secretRef:
+            name: common-secret
+        - secretRef:
+            name: recommend-secret
+        resources:
+          requests:
+            cpu: 256m
+            memory: 256Mi
+          limits:
+            cpu: 1024m
+            memory: 1024Mi
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8083
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8083
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8083
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      imagePullSecrets:
+      - name: acr-auth
